@@ -30,7 +30,11 @@
   "dependencies": {
     "@nativescript/core": "~7.0.0",
     "@nativescript/theme": "~2.3.0",
-    "nativescript-vue": "~2.8.0"
+    "@nstudio/nativescript-cardview": "^2.0.0",
+    "himalaya": "^1.1.0",
+    "nativescript-vue": "~2.8.0",
+    "nativescript-xml2js": "^0.5.2",
+    "xml2json": "^0.12.0"
   },
   "devDependencies": {
     "@babel/core": "~7.1.0",
