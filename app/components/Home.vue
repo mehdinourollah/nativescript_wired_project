@@ -14,11 +14,12 @@
           v-for="(item, index) of items"
           :key="index"
           margin="10"
-          padding="10"
+          padding="20"
           elevation="2"
           radius="20"
           @tap="gotoArticle(item)"
           height="150"
+          ripple="true"
         >
           <!-- <StackLayout orientation="horizontal"> -->
           <GridLayout rows="*" columns="*">
@@ -27,15 +28,15 @@
               <Label
                 fontSize="15"
                 fontWeight="bold"
-                size="10"
+                paddingLeft="5"
                 :text="item.title"
                 textWrap="true"
               ></Label>
               <ScrollView>
                 <Label
                   fontSize="15"
-                  size="10"
-                  :text="item.description"
+                  paddingLeft="5"
+                  :text="item.snippet"
                   textWrap="true"
                   verticalAlignment="bottom"
                 ></Label>
@@ -59,11 +60,14 @@ export default {
   data() {
     return {
       isLoaded: false,
-      items: [],
+
       url: "",
     };
   },
   computed: {
+    items() {
+      return this.$store.state.articles;
+    },
     message() {
       return "Blank {N}-Vue app";
     },
@@ -82,18 +86,23 @@ export default {
     },
     getArticles() {
       console.log("OK");
-      fetch("https://www.wired.com/feed/")
-        .then((response) => response.text())
-        .then((xml) => {
-          parseString(xml, (err, result) => {
-            // console.dir(result);
+      fetch(
+        "https://api-beta.civicfeed.com/news/search?q=science&page=1&results=5",
+        { headers: { "X-API-KEY": "UKzdNJIqjF6Vov4YRj5qB8eLEWj4odyH8Q5EoArS" } }
+      )
+        .then((response) => response.json())
+        .then((res) => {
+          // console.log({ articles: JSON.parse(res).articles });
+          this.$store.state.articles = res.articles;
+          console.log(this.$store.state.articles);
+          this.isLoaded = true;
+          return;
+          this.url =
+            result.rss.channel[0].item[0]["media:thumbnail"][0]["$"].url;
+          this.items = result.rss.channel[0].item;
+          this.items = this.items.slice(Math.max(this.items.length - 5, 0));
 
-            this.url =
-              result.rss.channel[0].item[0]["media:thumbnail"][0]["$"].url;
-            this.items = result.rss.channel[0].item;
-            this.items = this.items.slice(Math.max(this.items.length - 5, 0));
-            this.isLoaded = true;
-          });
+          // });
         })
         .catch((err) => console.log(err));
     },

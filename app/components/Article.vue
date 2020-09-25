@@ -1,62 +1,117 @@
 <template>
   <Page @loaded="onLoaded">
-    <!-- <Label v-if="!isBusy" :text="content" textWrap="true" /> -->
-    <!-- <WebView :src="item.link[0]" /> -->
-
-    <!-- <Label v-if="!isBusy" :text="html" textWrap="true" /> -->
-
-    <WebView v-if="!isBusy" :src="html" />
-    <!-- <ActivityIndicator v-else width="100" height="100" :busy="isBusy" /> -->
-
-    <!-- <WebView :src="item.link[0]" /> -->
+    <ScrollView>
+      <StackLayout>
+        <CardView>
+          <StackLayout>
+            <Label
+              fontSize="15"
+              fontWeight="bold"
+              :text="item.title"
+              textWrap="true"
+            />
+            <Label fontSize="15" :text="item.snippet" textWrap="true" />
+            <Label
+              fontSize="15"
+              :text="processedText.map((x) => '*' + x.maxEl).join(' ')"
+              textWrap="true"
+            />
+          </StackLayout>
+        </CardView>
+      </StackLayout>
+    </ScrollView>
   </Page>
 </template>
 
 <script>
-var parseString = require("nativescript-xml2js").parseString;
-var himalaya = require("himalaya");
+// const translate = require("@vitalets/google-translate-api");
+const httpModule = require("tns-core-modules/http");
 
 export default {
   props: ["item"],
   data() {
-    return {
-      json: "",
-      isBusy: true,
-      html: "",
-    };
+    return {};
   },
   computed: {
-    content() {
-      return JSON.stringify(this.json);
+    processedText() {
+      return this.text(
+        this.item.snippet
+          .replace(/[^a-zA-Z ]/g, "")
+          .split(/\W+/)
+          .filter((x) => x)
+      );
     },
   },
-
   methods: {
-    onLoaded() {
-      console.log("LOADEDDDDDDDDDDD");
-      console.log(this.item.link[0]);
-      this.getArticleContent();
+    mode(array) {
+      if (array.length == 0) return null;
+      var modeMap = {};
+      var maxEl = array[0],
+        maxCount = 1;
+      for (var i = 0; i < array.length; i++) {
+        var el = array[i];
+        if (modeMap[el] == null) modeMap[el] = 1;
+        else modeMap[el]++;
+        if (modeMap[el] > maxCount) {
+          maxEl = el;
+          maxCount = modeMap[el];
+        }
+      }
+      return { maxEl, maxCount };
     },
-    getArticleContent() {
-      // console.log(this.item.link[0]);
-
-      fetch(this.item.link[0])
-        // fetch('https://www.google.com/')
-        .then((response) => response.text())
-        .then((html) => {
-          var json = himalaya.parse(html);
-          // this.json = json.body.children[1];
-          console.log({ mamad: json });
-         
-          this.html = himalaya.stringify(this.json);
-
-          this.isBusy = false;
-
-          // console.log({ body: json[1].children[1].children[1] });
-
-          // console.log(json, { colors: true, depth: null });
-        })
-        .catch((err) => console.log(err));
+    rec(arr) {
+      let tempArr = arr;
+      let freq = [];
+      while (freq.length < 5) {
+        freq.push(this.mode(tempArr));
+        tempArr = tempArr.filter((x) => x != this.mode(tempArr).maxEl);
+      }
+      return freq;
+    },
+    text(arr) {
+      let tempArr = [];
+      tempArr = arr.filter(
+        (x) =>
+          x != "am" &&
+          x != "is" &&
+          x != "are" &&
+          x != "for" &&
+          x != "at" &&
+          x != "the" &&
+          x != "of" &&
+          x != "can" &&
+          x != "was" &&
+          x != "in" &&
+          x != "on" &&
+          x != "and" &&
+          x != "a" &&
+          x != "to" &&
+          x != "by" &&
+          x != "as" &&
+          x != "with" &&
+          x != "my" &&
+          x != "my" &&
+          x != "your" &&
+          x != "his" &&
+          x != "her" &&
+          x != "their" &&
+          x != "I" &&
+          x != "you" &&
+          x != "he" &&
+          x != "she" &&
+          x != "it" &&
+          x != "they"
+      );
+      console.log({ hhhhhhhhhhhh: this.rec(tempArr) });
+      return this.rec(tempArr);
+    },
+    onLoaded() {
+      this.text(
+        this.item.snippet
+          .replace(/[^a-zA-Z ]/g, "")
+          .split(/\W+/)
+          .filter((x) => x)
+      );
     },
   },
 };

@@ -31,9 +31,12 @@
     "@nativescript/core": "~7.0.0",
     "@nativescript/theme": "~2.3.0",
     "@nstudio/nativescript-cardview": "^2.0.0",
+    "@vitalets/google-translate-api": "^4.0.0",
+    "axios": "^0.20.0",
     "himalaya": "^1.1.0",
     "nativescript-vue": "~2.8.0",
     "nativescript-xml2js": "^0.5.2",
+    "vuex": "^3.5.1",
     "xml2json": "^0.12.0"
   },
   "devDependencies": {
